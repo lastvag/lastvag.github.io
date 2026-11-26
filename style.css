@@ -1,0 +1,228 @@
+/* Fri höjd – Fabler & Fakta Studio
+   Vanligt läge: gul vägskylt (lista) + ren karta. Körläge: mörkt hyttläge. */
+:root{
+  --gul:#FFD43B; --svart:#111; --rod:#D0021B; --rod-ljus:#FFE3E6; --rod-text:#9B0014;
+  --gulstatus:#F2B705; --gul-ljus:#FFF1C2; --gul-text:#6B4E00;
+  --gron:#1E9E5A; --gron-ljus:#DDF5E3; --gron-text:#145C2A;
+  --bg:#F4F5F2; --yta:#fff; --ink:#141A22; --muted:#4D5562; --linje:#E3E6EA;
+  --rubrik:'Barlow Condensed',system-ui,sans-serif;
+  --text:'Barlow',system-ui,sans-serif;
+  --safe-top:env(safe-area-inset-top,0px); --safe-bot:env(safe-area-inset-bottom,0px); --navh:calc(66px + var(--safe-bot));
+}
+html[data-tema=morkt]{
+  --bg:#0F1318; --yta:#181D25; --ink:#E9ECF1; --muted:#A3ACB9; --linje:#2A313C;
+  --rod-ljus:#3A1518; --rod-text:#FFB3B8; --gul-ljus:#3A3010; --gul-text:#FFE08A;
+  --gron-ljus:#10301F; --gron-text:#9BE8BC;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 var(--text);-webkit-tap-highlight-color:transparent;overflow:hidden}
+svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #1F5FD6;outline-offset:2px}
+[hidden]{display:none!important}
+.muted{color:var(--muted)}
+
+/* ---------- Vanligt läge ---------- */
+#app{height:100%;display:flex;flex-direction:column}
+.top{background:var(--gul);color:var(--svart);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + var(--safe-top)) 16px 10px}
+.brand{font:800 28px/1 var(--rubrik);letter-spacing:1px;display:flex;align-items:center;gap:10px}
+.brand-ikon{width:56px;height:56px;flex:none}
+.pill{display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:0;border-radius:999px;background:var(--svart);color:var(--gul);font:700 18px/1 var(--rubrik)}
+.pill svg{width:18px;height:18px}
+.banner{background:var(--svart);color:var(--gul);font-size:14px;padding:8px 16px;text-align:center}
+main{flex:1;position:relative;min-height:0}
+.vy{position:absolute;inset:0}
+#karta{position:absolute;inset:0;background:var(--bg)}
+.fab{position:absolute;z-index:500;right:14px;bottom:16px;height:52px;min-width:52px;border:0;border-radius:16px;background:var(--yta);color:#1F5FD6;box-shadow:0 2px 12px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;gap:8px}
+.fab-kor{right:auto;left:14px;padding:0 18px;background:var(--svart);color:var(--gul);font:700 19px/1 var(--rubrik);letter-spacing:.5px}
+html[data-tema=morkt] .fab-kor{background:var(--gul);color:var(--svart)}
+
+.flikar{display:flex;position:relative;z-index:2100;min-height:var(--navh);box-sizing:border-box;background:var(--svart);padding:6px 0 calc(8px + var(--safe-bot))}
+.flik{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;border:0;background:none;color:#AEB4BD;font:700 15px/1.1 var(--rubrik);letter-spacing:0;white-space:nowrap}
+.flik.aktiv{color:var(--gul)}
+
+/* Lista – vägskylten */
+#vyLista{overflow-y:auto;background:var(--gul);color:var(--svart)}
+html[data-tema=morkt] #vyLista{background:var(--bg);color:var(--ink)}
+.listhuvud{padding:16px 16px 6px}
+.listhuvud h1{margin:0 0 10px;font:700 26px/1.1 var(--rubrik)}
+.filter{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:0 14px;border-radius:999px;border:2px solid var(--svart);background:transparent;font-weight:600;font-size:15px}
+.chip.aktiv{background:var(--svart);color:var(--gul)}
+html[data-tema=morkt] .chip{border-color:var(--muted)}
+html[data-tema=morkt] .chip.aktiv{background:var(--gul);color:var(--svart);border-color:var(--gul)}
+.listhuvud .muted{margin:10px 0 0;font-size:14px;color:inherit;opacity:.8}
+.lista{list-style:none;margin:0;padding:8px 16px 24px;display:flex;flex-direction:column;gap:8px}
+.lista li{background:var(--yta);color:var(--ink);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:12px}
+.lista button.rad{all:unset;flex:1;display:flex;align-items:center;gap:12px;cursor:pointer;min-height:48px}
+.lista .info{flex:1;min-width:0}
+.lista .namn{font-weight:600;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lista .sub{font-size:14px;color:var(--muted)}
+.skylt{width:50px;height:50px;border-radius:50%;border:6px solid var(--rod);background:#fff;color:#111;display:flex;align-items:center;justify-content:center;font:800 16px/1 var(--rubrik);flex:none}
+.status{font-weight:600;font-size:13px;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.s-rod{background:var(--rod-ljus);color:var(--rod-text)}
+.s-gul{background:var(--gul-ljus);color:var(--gul-text)}
+.s-gron{background:var(--gron-ljus);color:var(--gron-text)}
+.tom{padding:24px 16px;text-align:center}
+
+/* Kartmarkörer */
+.mark{width:40px;height:40px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font:800 14px/1 var(--rubrik);color:#fff}
+.mark.m-rod{background:var(--rod)}.mark.m-gul{background:var(--gulstatus);color:#111}.mark.m-gron{background:var(--gron)}
+.mig{width:22px;height:22px;border-radius:50%;background:#1F5FD6;border:4px solid #fff;box-shadow:0 0 0 8px rgba(31,95,214,.22)}
+.leaflet-popup-content{font:15px/1.4 var(--text);margin:12px 14px}
+.leaflet-popup-content b{font:700 20px/1.1 var(--rubrik)}
+.leaflet-container{font-family:var(--text)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--yta);color:var(--ink)}
+html[data-tema=morkt] .leaflet-bar a{background:var(--yta);color:var(--ink);border-color:var(--linje)}
+html[data-tema=morkt] .leaflet-control-attribution{background:rgba(15,19,24,.8);color:var(--muted)}
+html[data-tema=morkt] .leaflet-control-attribution a{color:#8DB5FF}
+
+/* ---------- Dialoger ---------- */
+.ark{border:0;padding:0;width:min(520px,100%);max-height:calc(100vh - var(--navh) - 40px);margin:auto auto var(--navh);border-radius:22px 22px 0 0;background:var(--yta);color:var(--ink)}
+.ark#dlgInst{position:fixed;left:0;right:0;top:auto;bottom:var(--navh);margin:0 auto;z-index:2050;max-height:calc(100% - var(--navh) - 24px);overflow-y:auto;box-shadow:0 -6px 30px rgba(0,0,0,.35)}
+.ark::backdrop{background:rgba(0,0,0,.45)}
+.ark form{padding:18px 18px calc(20px + var(--safe-bot));display:flex;flex-direction:column;gap:14px}
+.ark h2{margin:0;font:700 26px/1.1 var(--rubrik)}
+.ark-huvud{display:flex;justify-content:space-between;align-items:center}
+.ikonknapp{width:44px;height:44px;border:0;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center}
+fieldset{border:1px solid var(--linje);border-radius:14px;margin:0;padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px}
+legend{font:700 17px/1 var(--rubrik);letter-spacing:.5px;padding:0 6px}
+label{font-weight:500}
+input[type=number],select{height:48px;border:1px solid var(--linje);border-radius:12px;padding:0 12px;background:var(--bg);font-size:17px;width:100%}
+.stegare{display:flex;gap:8px}
+.stegare button{width:52px;height:48px;border:0;border-radius:12px;background:var(--svart);color:var(--gul);font:700 26px/1 var(--rubrik)}
+.stegare input{text-align:center;font-weight:700}
+.stor-stegare input,.stor-stegare button{height:64px;font-size:30px}
+.vaxel{display:flex;align-items:center;gap:10px;min-height:44px}
+.vaxel input{width:22px;height:22px;accent-color:#1F5FD6}
+.knapp-prim{height:56px;border:0;border-radius:16px;background:var(--svart);color:var(--gul);font:700 21px/1 var(--rubrik);letter-spacing:.5px}
+html[data-tema=morkt] .knapp-prim{background:var(--gul);color:var(--svart)}
+.knapp-sek{display:flex;align-items:center;justify-content:center;min-height:48px;border:2px solid var(--ink);border-radius:12px;font-weight:600;cursor:pointer;text-align:center;padding:4px 10px}
+.knapp-lank{background:none;border:0;color:#1F5FD6;font-weight:600;min-height:44px}
+html[data-tema=morkt] .knapp-lank{color:#8DB5FF}
+.dold{position:absolute;width:1px;height:1px;opacity:0}
+.ansvar{margin:0;font-size:14px;background:var(--gul-ljus);color:var(--gul-text);border-radius:12px;padding:10px 12px}
+.liten-text{font-size:13px;margin:0}
+
+/* ---------- Hyttläge ---------- */
+#hytt{position:fixed;top:0;left:0;right:0;bottom:var(--navh);z-index:2000;background:#0B0E13;color:#E9ECF1;font-family:var(--rubrik);display:flex;flex-direction:column;gap:14px;padding:calc(14px + var(--safe-top)) 18px 16px;overflow-y:auto}
+.hytt-top{display:flex;align-items:center;justify-content:space-between}
+.hytt-etikett{display:flex;align-items:center;gap:10px;font:600 16px/1 var(--rubrik);letter-spacing:3px;color:#A3ACB9}
+.prick{width:10px;height:10px;border-radius:50%;background:var(--gul)}
+.hytt-knapp{width:48px;height:48px;border-radius:14px;background:#161B23;border:1px solid #2A313C;color:#C7CDD6;display:flex;align-items:center;justify-content:center}
+.hytt-tillbaka{display:flex;align-items:center;gap:8px;min-height:52px;padding:0 18px;border:0;border-radius:16px;background:var(--gul);color:#111;font:700 20px/1 var(--rubrik);letter-spacing:.5px}
+.hytt-tillbaka svg{width:24px;height:24px}
+.hytt-kort{background:#141922;border:1px solid #262D38;border-radius:24px;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.hytt-kort .rad{display:flex;justify-content:space-between;font-size:15px;letter-spacing:2px;color:#A3ACB9}
+.jattesiffra{font:800 clamp(72px,26vw,120px)/.95 var(--rubrik);font-variant-numeric:tabular-nums}
+.jattesiffra small{font-size:.38em;color:#A3ACB9;font-weight:600}
+.matare{height:8px;border-radius:4px;background:#262D38;overflow:hidden}
+.matare div{height:100%;width:0;background:var(--gul);transition:width .6s}
+.tva{display:flex;gap:10px}
+.ruta{flex:1;background:#0B0E13;border-radius:16px;padding:12px 14px}
+.liten{font-size:14px;letter-spacing:1.5px;color:#A3ACB9}
+.stor{font:800 44px/1.05 var(--rubrik)}
+.hytt-namn{font:500 19px/1.3 var(--text)}
+.c-rod{color:#FF6B70}.c-gul{color:#FFC861}.c-gron{color:#6EE7A0}
+.hytt-varning{background:#2A1416;border:1px solid #5C2327;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;font:600 20px/1.25 var(--text);color:#FFD9DA}
+.hytt-varning svg{width:30px;height:30px;color:#FF6B70}
+.hytt-varning.gul{background:#2A2410;border-color:#5C4A18;color:#FFEBB0}
+.hytt-varning.gul svg{color:#FFC861}
+.hytt-lugn{background:#10251A;border:1px solid #1E4A30;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;font:600 19px/1.3 var(--text);color:#C9F5DA}
+.hytt-lugn svg{width:30px;height:30px;color:#6EE7A0}
+.hytt-sekundar{min-height:56px;border:1px solid #2A313C;border-radius:18px;background:#141922;color:#C7CDD6;font:600 19px/1 var(--text)}
+.hytt-darefter{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.hytt-darefter .ruta{background:#141922}
+.hytt-darefter .stor{font-size:26px}
+.hytt-darefter .sub{font:500 14px/1.3 var(--text);color:#A3ACB9}
+.hytt-gps{margin:0;font:500 13px/1.3 var(--text);color:#8A93A0;text-align:center}
+
+/* Fordon */
+input[type=text]{height:48px;border:1px solid var(--linje);border-radius:12px;padding:0 12px;background:var(--bg);font-size:17px;width:100%}
+.falt2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.falt2 label{display:flex;flex-direction:column;gap:4px;font-size:15px}
+.fordonknappar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fraga{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--rod-ljus);color:var(--rod-text);border-radius:12px;padding:10px}
+.fraga span{flex-basis:100%;font-weight:600}
+.ta-bort{width:44px;height:44px;border:0;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex:none}
+
+/* Om appen */
+.om{border:1px solid var(--linje);border-radius:14px;padding:12px 14px}
+.om summary{font:700 18px/1.2 var(--rubrik);cursor:pointer;min-height:32px;display:flex;align-items:center}
+.om h3{font:700 17px/1.2 var(--rubrik);margin:14px 0 4px}
+.om ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.om p{font-size:15px}
+.om a{color:#1F5FD6}
+html[data-tema=morkt] .om a{color:#8DB5FF}
+
+/* Språkval */
+.sprakval{display:flex;flex-direction:column;gap:6px;border:1px solid var(--linje);border-radius:16px;padding:12px 14px}
+.sprakval label{display:flex;align-items:center;gap:8px;font:700 18px/1.2 var(--rubrik)}
+.ej-granskad{display:inline-block;background:var(--gul-ljus);color:var(--gul-text);border-radius:8px;padding:2px 8px;font-size:13px;font-weight:600}
+
+/* Inställningar som klickbara rubriker */
+.sektion{border:1px solid var(--linje);border-radius:16px;background:var(--yta);overflow:hidden}
+.sektion>summary{list-style:none;display:flex;align-items:center;gap:14px;min-height:64px;padding:10px 14px;cursor:pointer}
+.sektion>summary::-webkit-details-marker{display:none}
+.sek-ikon{width:42px;height:42px;border-radius:12px;background:var(--gul);color:#111;display:flex;align-items:center;justify-content:center;flex:none}
+.sek-text{flex:1;display:flex;flex-direction:column;min-width:0}
+.sek-text b{font:700 20px/1.15 var(--rubrik)}
+.sek-text small{font-size:14px;color:var(--muted)}
+.sektion .pil{color:var(--muted);transition:transform .2s}
+.sektion[open] .pil{transform:rotate(90deg)}
+.sektion[open]>summary{border-bottom:1px solid var(--linje)}
+.sek-inneh{padding:14px;display:flex;flex-direction:column;gap:8px}
+.sek-inneh .om-p{margin:0}
+
+/* Röst */
+.rost-falt{display:flex;flex-direction:column;gap:8px;border-left:4px solid #1F5FD6;padding-left:10px}
+.rost-falt .kon{display:flex;gap:18px}
+.rost-falt input[type=range]{width:100%;height:44px;accent-color:#1F5FD6}
+
+/* ADR */
+.adr-falt{display:flex;flex-direction:column;gap:8px;border-left:4px solid #E8590C;padding-left:10px}
+.adr-falt a,.lank{color:#1F5FD6}
+html[data-tema=morkt] .adr-falt a,html[data-tema=morkt] .lank{color:#8DB5FF}
+.lank{text-decoration:none;border-color:currentColor}
+#nemRad{display:flex;flex-direction:column;gap:4px;font-size:15px}
+
+/* Bärighet */
+.bk-panel{position:absolute;z-index:500;left:12px;top:12px;max-width:calc(100% - 70px);display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:calc(100% - 80px)}
+.bk-knapp{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border:0;border-radius:14px;background:var(--yta);color:var(--ink);font:700 17px/1 var(--rubrik);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.bk-knapp[aria-pressed=true]{background:var(--svart);color:var(--gul)}
+html[data-tema=morkt] .bk-knapp[aria-pressed=true]{background:var(--gul);color:var(--svart)}
+.bk-legend{background:var(--yta);color:var(--ink);border-radius:12px;padding:8px 10px;font-size:13px;line-height:1.35;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.bk-legend:empty{display:none}
+.lagerknappar{display:flex;flex-wrap:wrap;gap:6px}
+.lagerknappar .bk-knapp{height:44px;padding:0 12px;font-size:16px;gap:6px}
+.lagerknappar .bk-knapp[aria-pressed=false]{opacity:.85;text-decoration:line-through;text-decoration-thickness:2px}
+.legend-ruta summary{cursor:pointer;font-weight:600;min-height:28px;display:flex;align-items:center}
+.legend-ruta[open] summary{margin-bottom:6px}
+#kartLegend>div+div{margin-top:4px;padding-top:4px;border-top:1px solid var(--linje)}
+.leg-rubrik{font-weight:700;margin-right:6px}
+.bk-legend i.p{width:10px;height:10px;border-radius:50%}
+.bk-legend i.streck{width:18px;height:0;border-top:4px dashed;background:none;border-radius:0}
+.bk-legend i.streck.tunn{border-top-width:2px}
+.bk-legend i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.grupphuvud{font-weight:500;margin-top:4px}
+.grupper{display:flex;flex-direction:column;gap:8px}
+.grupp{border:1px solid var(--linje);border-radius:12px;padding:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:end}
+.grupp .full{grid-column:1/-1;display:flex;gap:8px;align-items:center}
+.grupp .full select{flex:1}
+.grupp label{font-size:14px;display:flex;flex-direction:column;gap:4px}
+.grupp input[type=number]{height:44px;font-size:16px}
+.grupp .vaxel{flex-direction:row;font-size:14px;grid-column:1/-1;min-height:36px}
+.bk-resultat{display:grid;gap:6px}
+.bk-rad{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:8px 10px;font-size:15px}
+.bk-rad b{font:800 18px/1.1 var(--rubrik);min-width:40px}
+.bk-rad.ok{background:var(--gron-ljus);color:var(--gron-text)}
+.bk-rad.nej{background:var(--rod-ljus);color:var(--rod-text)}
+.hytt-bk{background:#141922;border:1px solid #262D38;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:14px}
+.hytt-bk .stor{font-size:34px}
+.hytt-bk-text{font:500 16px/1.3 var(--text);color:#C7CDD6}
+.hytt-bk.varn{background:#2A1416;border-color:#5C2327}
+.hytt-bk.varn .hytt-bk-text{color:#FFD9DA;font-weight:600}
+
+@media (prefers-reduced-motion:reduce){.matare div{transition:none}}

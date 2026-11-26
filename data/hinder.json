@@ -1,0 +1,14 @@
+{"kalla":"Exempeldata – inte Trafikverkets","uppdaterad":"","exempel":true,"hinder":[
+{"id":"ex1","lat":57.7712,"lon":12.2695,"h":3.6,"namn":"Exempel: järnvägsviadukt","vag":"1970"},
+{"id":"ex2","lat":57.9285,"lon":12.5320,"h":4.0,"namn":"Exempel: gångbro","vag":"E20"},
+{"id":"ex3","lat":57.8105,"lon":12.3640,"h":4.2,"namn":"Exempel: viadukt","vag":"190"},
+{"id":"ex4","lat":57.7905,"lon":12.3150,"h":4.5,"namn":"Exempel: bro","vag":"1970"},
+{"id":"ex5","lat":57.7215,"lon":11.9905,"h":3.3,"namn":"Exempel: järnvägsbro","vag":""},
+{"id":"ex6","lat":57.7055,"lon":11.9410,"h":4.1,"namn":"Exempel: portal","vag":""},
+{"id":"ex7","lat":57.6860,"lon":11.9980,"h":3.9,"namn":"Exempel: viadukt","vag":"40"},
+{"id":"ex8","lat":57.7480,"lon":12.0620,"h":4.4,"namn":"Exempel: gångbro","vag":"E45"},
+{"id":"ex9","lat":57.6550,"lon":12.0210,"h":3.75,"namn":"Exempel: järnvägsviadukt","vag":"27"},
+{"id":"ex10","lat":57.7820,"lon":11.9300,"h":4.25,"namn":"Exempel: bro","vag":"155"},
+{"id":"ex11","lat":58.2840,"lon":12.2890,"h":3.8,"namn":"Exempel: viadukt","vag":"44"},
+{"id":"ex12","lat":57.9820,"lon":12.0400,"h":4.3,"namn":"Exempel: järnvägsbro","vag":"E45"}
+]}

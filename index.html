@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFD43B">
+<title>Lastväg</title>
+<meta name="description" content="Höjdhinder på svenska vägar för lastbilar, enligt Trafikverkets vägdata (NVDB).">
+<link rel="manifest" href="manifest.webmanifest?v=2">
+<link rel="icon" href="icon-192.png?v=2" type="image/png" sizes="192x192">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lastväg">
+<link rel="stylesheet" href="lib/fonts/fonts.css">
+<link rel="stylesheet" href="lib/leaflet/leaflet.css">
+<link rel="stylesheet" href="style.css?v=22">
+</head>
+<body>
+
+<!-- ===== Kartan + listan (vanligt läge) ===== -->
+<div id="app">
+  <header class="top">
+    <div class="brand" data-ingen-oversattning><svg class="brand-ikon" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="88" fill="#fff" stroke="#D0021B" stroke-width="20"/><path d="M84 28h32l-16 27z" fill="#111" stroke="none"/><path d="M84 172h32l-16-27z" fill="#111" stroke="none"/><text x="100" y="121" text-anchor="middle" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="800" font-size="62" fill="#111" stroke="none">4,5</text></svg>LASTVÄG</div>
+    <button id="btnFordon" class="pill" aria-label="Ändra fordonets höjd">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="13" height="10"/><path d="M15 10h4l3 3v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+      <span id="pillHojd">4,10 m</span>
+    </button>
+  </header>
+
+  <div id="exempelBanner" class="banner" hidden>Exempeldata – inga riktiga höjder. Ladda Trafikverkets data under Inställningar.</div>
+
+  <main>
+    <section id="vyKarta" class="vy">
+      <div id="karta" aria-label="Karta över höjdhinder"></div>
+      <div class="bk-panel">
+        <div class="lagerknappar" role="group" aria-label="Visa på kartan">
+          <button id="btnLagerHojd" class="bk-knapp" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V8a8 8 0 0 1 16 0v12"/><path d="M12 3v4M12 21v-4"/></svg>Höjd</button>
+          <button id="btnLagerBk" class="bk-knapp" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18M5 18V9l7-4 7 4v9M9 18v-5h6v5"/></svg>Bärighet</button>
+          <button id="btnLagerAdr" class="bk-knapp" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 2 12l10 10 10-10z"/><path d="M12 8v5M12 16v.5"/></svg>ADR</button>
+        </div>
+        <details class="bk-legend legend-ruta"><summary>Teckenförklaring</summary><div id="kartLegend"></div></details>
+      </div>
+      <button id="btnCentrera" class="fab" aria-label="Centrera på min position">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 20l8-4 8 4z"/></svg>
+      </button>
+    </section>
+
+    <section id="vyLista" class="vy" hidden>
+      <div class="listhuvud">
+        <h1 id="listRubrik">Höjdhinder i närheten</h1>
+        <div class="filter" role="group" aria-label="Filter">
+          <button class="chip aktiv" data-filter="alla">Alla</button>
+          <button class="chip" data-filter="problem">För låga och nära gränsen</button>
+        </div>
+        <p id="listInfo" class="muted"></p>
+      </div>
+      <ul id="lista" class="lista"></ul>
+    </section>
+  </main>
+
+  <nav class="flikar" aria-label="Huvudmeny">
+    <button class="flik aktiv" data-vy="karta">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Karta
+    </button>
+    <button class="flik" data-vy="kor">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 12v9M3.5 9.5 12 12l8.5-2.5"/></svg>Körläge
+    </button>
+    <button class="flik" data-vy="lista">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Lista
+    </button>
+    <button class="flik" data-vy="install">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Inställningar
+    </button>
+  </nav>
+</div>
+
+<!-- ===== Hyttläge (körning) ===== -->
+<div id="hytt" hidden>
+  <header class="hytt-top">
+    <div class="hytt-etikett"><span class="prick"></span>LASTVÄG · KÖRLÄGE</div>
+  </header>
+
+  <section id="hyttKort" class="hytt-kort">
+    <div class="rad"><span>HINDER OM</span><span id="hyttDinHojd">DIN HÖJD 4,10 M</span></div>
+    <div id="hyttAvstand" class="jattesiffra">–</div>
+    <div class="matare"><div id="hyttMatare"></div></div>
+    <div class="tva">
+      <div class="ruta"><div class="liten">FRI HÖJD</div><div id="hyttFri" class="stor">–</div></div>
+      <div class="ruta"><div class="liten">MARGINAL</div><div id="hyttMarg" class="stor">–</div></div>
+    </div>
+    <div id="hyttNamn" class="hytt-namn"></div>
+  </section>
+
+  <div class="hytt-bk">
+    <div><div class="liten">VÄGENS BÄRIGHET</div><div id="hyttBk" class="stor">–</div></div>
+    <div id="hyttBkText" class="hytt-bk-text"></div>
+  </div>
+
+  <div id="hyttAdrRuta" class="hytt-bk" hidden>
+    <div><div class="liten">FARLIGT GODS</div><div id="hyttAdr" class="stor">ADR</div></div>
+    <div id="hyttAdrText" class="hytt-bk-text"></div>
+  </div>
+
+  <div id="hyttVarning" class="hytt-varning" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18v.5"/></svg>
+    <div id="hyttVarnText"></div>
+  </div>
+
+  <div id="hyttLugn" class="hytt-lugn" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+    <div>Inga låga hinder framför dig de närmaste 3 km.</div>
+  </div>
+
+  <button id="btnIgnorera" class="hytt-sekundar">Jag kör inte hit</button>
+
+  <div class="hytt-darefter">
+    <div class="liten">DÄREFTER</div>
+    <div id="hyttDarefter" class="tva"></div>
+  </div>
+  <p id="hyttGps" class="hytt-gps"></p>
+</div>
+
+<!-- ===== Inställningar ===== -->
+<dialog id="dlgInst" class="ark" aria-labelledby="instRubrik">
+  <form method="dialog" id="formInst">
+    <div class="ark-huvud">
+      <h2 id="instRubrik">Inställningar</h2>
+      <button value="stang" class="ikonknapp" aria-label="Stäng">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="sprakval">
+      <label for="inSprak"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg> Språk / Language</label>
+      <select id="inSprak" data-ingen-oversattning></select>
+      <p id="sprakInfo" class="muted liten-text"></p>
+    </div>
+    <details class="sektion" id="sekFordon" name="inst">
+      <summary><span class="sek-ikon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 7h13v10H2zM15 10h4l3 3v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></span><span class="sek-text"><b>Mina fordon</b><small>Mått, vikt, axlar och ADR</small></span><svg class="pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></summary>
+      <div class="sek-inneh">
+      <label for="valFordon">Aktivt fordon</label>
+      <div class="fordonval">
+        <select id="valFordon"></select>
+      </div>
+      <div class="fordonknappar">
+        <button type="button" id="btnNyttFordon" class="knapp-sek">+ Nytt</button>
+        <button type="button" id="btnKopiera" class="knapp-sek">Kopiera</button>
+        <button type="button" id="btnTaBort" class="knapp-sek">Ta bort</button>
+      </div>
+      <div id="taBortFraga" class="fraga" hidden>
+        <span id="taBortText"></span>
+        <button type="button" id="btnTaBortJa" class="knapp-sek">Ja, ta bort</button>
+        <button type="button" id="btnTaBortNej" class="knapp-lank">Avbryt</button>
+      </div>
+
+      <div class="falt2">
+        <label>Namn<input id="fNamn" type="text" maxlength="40" placeholder="t.ex. Scania + trailer"></label>
+        <label>Registreringsnummer<input id="fReg" type="text" maxlength="12" autocapitalize="characters" placeholder="ABC 123"></label>
+      </div>
+      <label for="fTyp">Typ av fordon</label>
+      <select id="fTyp">
+        <option value="lastbil">Lastbil</option>
+        <option value="lastbil-slap">Lastbil med släp</option>
+        <option value="dragbil-pv">Dragbil med påhängsvagn</option>
+        <option value="dragbil-dolly">Dragbil med dolly och påhängsvagn</option>
+        <option value="buss">Buss</option>
+        <option value="annat">Annat</option>
+      </select>
+
+      <div class="grupphuvud">Mått (meter)</div>
+      <label for="fHojd">Höjd, inklusive last</label>
+      <div class="stegare">
+        <button type="button" data-steg="-0.05" aria-label="Minska höjden 5 cm">−</button>
+        <input id="fHojd" type="number" inputmode="decimal" step="0.01" min="1.5" max="5">
+        <button type="button" data-steg="0.05" aria-label="Öka höjden 5 cm">+</button>
+      </div>
+      <div class="falt2">
+        <label>Bredd<input id="fBredd" type="number" inputmode="decimal" step="0.01" min="1" max="5"></label>
+        <label>Längd<input id="fLangd" type="number" inputmode="decimal" step="0.01" min="2" max="40"></label>
+      </div>
+
+      <div class="grupphuvud">Vikt (ton)</div>
+      <div class="falt2">
+        <label>Bruttovikt, hela ekipaget<input id="fVikt" type="number" inputmode="decimal" step="0.1" min="1" max="100"></label>
+        <label>Tjänstevikt (tomvikt)<input id="fTjanst" type="number" inputmode="decimal" step="0.1" min="0" max="100"></label>
+      </div>
+      <label for="fAxelavst">Avstånd mellan första och sista axeln (meter)</label>
+      <input id="fAxelavst" type="number" inputmode="decimal" step="0.01" min="0.5" max="40">
+
+      <div class="grupphuvud">Axlar och axelgrupper, framifrån</div>
+      <div id="grupper" class="grupper"></div>
+      <button type="button" id="btnNyGrupp" class="knapp-sek">+ Lägg till axel eller axelgrupp</button>
+      <p id="summaInfo" class="muted liten-text"></p>
+
+      <div class="grupphuvud">Farligt gods (ADR)</div>
+      <label class="vaxel"><input type="checkbox" id="fAdr"> Fordonet kör farligt gods med orangefärgade skyltar</label>
+      <div id="adrFalt" class="adr-falt">
+        <label for="fTunnelkod">Tunnelrestriktionskod för lasten (se transportdokumentet)</label>
+        <select id="fTunnelkod">
+          <option value="B">B</option><option value="B1000C">B1000C</option><option value="B/D">B/D</option><option value="B/E">B/E</option>
+          <option value="C">C</option><option value="C5000D">C5000D</option><option value="C/D">C/D</option><option value="C/E">C/E</option>
+          <option value="D">D</option><option value="D/E">D/E</option><option value="E">E</option><option value="-">– (ingen)</option>
+        </select>
+        <label class="vaxel"><input type="checkbox" id="fTank"> Transport i tank eller bulk</label>
+        <label id="nemRad">Nettoexplosivmassa (kg)<input id="fNem" type="number" inputmode="decimal" step="1" min="0"></label>
+        <p id="adrInfo" class="muted liten-text"></p>
+        <p class="liten-text">Har du flera ämnen ombord gäller den strängaste koden.
+          Kontrollera alltid lokala föreskrifter för farligt gods i
+          <a href="https://www.stfs.se" target="_blank" rel="noopener">Svensk trafikföreskriftssamling (STFS)</a>.</p>
+      </div>
+
+      <div class="grupphuvud">Får köra på</div>
+      <div id="bkResultat" class="bk-resultat" aria-live="polite"></div>
+      <p class="muted liten-text">Allt sparas automatiskt i telefonen.</p>
+      </div>
+    </details>
+    <details class="sektion" id="sekVarn" name="inst">
+      <summary><span class="sek-ikon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18v.5"/></svg></span><span class="sek-text"><b>Varningar</b><small>Höjdmarginal och automatiskt körläge</small></span><svg class="pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></summary>
+      <div class="sek-inneh">
+      <label for="inMarg">Varna även när höjdmarginalen är mindre än (meter)</label>
+      <input id="inMarg" type="number" inputmode="decimal" step="0.05" min="0" max="1">
+      <label class="vaxel"><input type="checkbox" id="inAutoKor"> Slå på körläge automatiskt när jag kör</label>
+      </div>
+    </details>
+    <details class="sektion" id="sekRost" name="inst">
+      <summary><span class="sek-ikon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg></span><span class="sek-text"><b>Röst</b><small>Språk, röst, tonhöjd och hastighet</small></span><svg class="pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></summary>
+      <div class="sek-inneh">
+      <label class="vaxel"><input type="checkbox" id="inRost"> Röstvarning</label>
+      <div id="rostFalt" class="rost-falt">
+        <label for="inRostSprak">Språk för röstvarningar</label>
+        <select id="inRostSprak">
+          <option value="sv">Svenska</option>
+          <option value="en">English</option>
+          <option value="pl">Polski</option>
+          <option value="ro">Română</option>
+        </select>
+        <div class="grupphuvud">Röst</div>
+        <div class="kon" role="radiogroup" aria-label="Röstens kön">
+          <label class="vaxel"><input type="radio" name="rostKon" value="kvinna"> Kvinnlig</label>
+          <label class="vaxel"><input type="radio" name="rostKon" value="man"> Manlig</label>
+        </div>
+        <label for="inRostVal">Välj en särskild röst (valfritt)</label>
+        <select id="inRostVal"></select>
+        <label for="inPitch">Tonhöjd (pitch): <b id="pitchVarde">1,00</b></label>
+        <input id="inPitch" type="range" min="0.5" max="1.5" step="0.05">
+        <label for="inTakt">Talhastighet: <b id="taktVarde">1,00</b></label>
+        <input id="inTakt" type="range" min="0.7" max="1.4" step="0.05">
+        <div class="fordonknappar" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+          <button type="button" id="btnTestaRost" class="knapp-sek">Testa rösten</button>
+          <button type="button" id="btnAterstallRost" class="knapp-sek">Återställ</button>
+        </div>
+        <p id="rostInfo" class="muted liten-text"></p>
+      </div>
+      </div>
+    </details>
+    <details class="sektion" id="sekKarta" name="inst">
+      <summary><span class="sek-ikon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span><span class="sek-text"><b>Karta</b><small>Lager och mörkt läge</small></span><svg class="pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></summary>
+      <div class="sek-inneh">
+      <label class="vaxel"><input type="checkbox" id="inVisaBk"> Visa bärighet på kartan (kan också slås av och på direkt på kartan)</label>
+      <label for="inTema">Mörkt läge</label>
+      <select id="inTema">
+        <option value="auto">Automatiskt (efter solnedgång)</option>
+        <option value="ljust">Alltid ljust</option>
+        <option value="morkt">Alltid mörkt</option>
+      </select>
+      </div>
+    </details>
+    <details class="sektion" id="sekData" name="inst">
+      <summary><span class="sek-ikon"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span><span class="sek-text"><b>Data</b><small>Vägdata och egna filer</small></span><svg class="pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></summary>
+      <div class="sek-inneh">
+      <p id="dataInfo" class="muted"></p>
+      <p id="bkDataInfo" class="muted"></p>
+      <p id="adrDataInfo" class="muted"></p>
+      <label for="inFil" class="knapp-sek">Ladda egen datafil – höjdhinder, bärighet eller farligt gods</label>
+      <input id="inFil" type="file" accept=".json,.geojson,application/json" class="dold">
+      <button type="button" id="btnStandardData" class="knapp-lank">Återställ till appens data</button>
+      </div>
+    </details>
+    <details class="sektion" id="sekFore" name="inst">
+      <summary><span class="sek-ikon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h8M9 17h8"/></svg></span><span class="sek-text"><b>Föreskrifter</b><small>Lokala trafikföreskrifter och NVDB</small></span><svg class="pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></summary>
+      <div class="sek-inneh">
+      <p class="liten-text">Lokala trafikföreskrifter (förbud, viktgränser, farligt gods, tider) gäller alltid före appen.</p>
+      <a class="knapp-sek lank" href="https://www.stfs.se" target="_blank" rel="noopener">Lokala trafikföreskrifter – STFS (Transportstyrelsen)</a>
+      <a class="knapp-sek lank" href="https://nvdbpakarta.trafikverket.se/map" target="_blank" rel="noopener">NVDB på karta (Trafikverket)</a>
+      <p class="muted liten-text">Adresser: www.stfs.se · nvdbpakarta.trafikverket.se</p>
+      </div>
+    </details>
+    <details class="sektion" id="sekOm" name="inst">
+      <summary><span class="sek-ikon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></span><span class="sek-text"><b>Om appen</b><small>Källor, licenser och integritet</small></span><svg class="pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></summary>
+      <div class="sek-inneh">
+      <p>Lastväg är gjord av <a href="https://fablerfakta.github.io" target="_blank" rel="noopener"><b>Fabler &amp; Fakta Studio</b></a>, en liten oberoende studio i Västsverige. Appen är ett stöd för förare – den ersätter inte vägmärken, lokala trafikföreskrifter eller förarens eget ansvar.</p>
+
+      <h3>Vägdata</h3>
+      <ul>
+        <li><b>Höjdhinder, bärighetsklass, begränsad bruttovikt, axel- och boggitryck, bredd och längd, framkomlighet, förbud mot trafik, väghinder, miljözoner, farligt gods (inskränkningar och rekommenderade vägar), broar och tunnlar, vägnummer och gatunamn</b> – Trafikverkets Nationella vägdatabas (NVDB), hämtad från Lastkajen. Öppna data, licens CC0.</li>
+        <li id="omDatastatus" class="muted"></li>
+      </ul>
+
+      <h3>Regler som appen räknar med</h3>
+      <ul>
+        <li><b>Bruttovikt per bärighetsklass</b> – trafikförordningen (1998:1276) bilaga 1–4, som de återges i Transportstyrelsens ”Lasta lagligt” (2026).</li>
+        <li><b>Axel-, boggi- och trippelaxeltryck</b> – trafikförordningen 4 kap. 12 §.</li>
+        <li><b>Tunnelrestriktionskoder för farligt gods</b> – ADR, avsnitt 8.6.4.</li>
+        <li><b>Miljözoner</b> – trafikförordningen 4 kap. 22–23 §§.</li>
+      </ul>
+
+      <h3>Karta och teknik</h3>
+      <ul>
+        <li><b>Bakgrundskarta</b> – © OpenStreetMaps bidragsgivare (ODbL). Mörk karta och reservkarta: © CARTO.</li>
+        <li><b>Kartvisning</b> – Leaflet 1.9.4 (öppen källkod, BSD-licens), inbyggd i appen.</li>
+        <li><b>Typsnitt</b> – Barlow och Barlow Condensed (SIL Open Font License), inbyggda i appen.</li>
+      </ul>
+
+      <h3>Kontrollera alltid</h3>
+      <ul>
+        <li>Lokala trafikföreskrifter: <a href="https://www.stfs.se" target="_blank" rel="noopener">Svensk trafikföreskriftssamling (STFS)</a> – www.stfs.se</li>
+        <li>Vägdata på karta: <a href="https://nvdbpakarta.trafikverket.se/map" target="_blank" rel="noopener">NVDB på karta (Trafikverket)</a></li>
+      </ul>
+      <p class="muted liten-text">Inga personuppgifter skickas till oss. Fordon och inställningar sparas bara i din telefon, och din position används bara i appen. Kartbilderna hämtas från OpenStreetMap och CARTO.</p>
+      <p><a href="integritet.html" target="_blank" rel="noopener">Integritetspolicy / Privacy policy</a></p>
+      <p class="muted liten-text">Kontakt: fablerfakta@proton.me · <a href="https://fablerfakta.github.io" target="_blank" rel="noopener">fablerfakta.github.io</a></p>
+      </div>
+    </details>
+    <p class="ansvar">Följ alltid skyltningen på plats. Uppgifterna kommer från Trafikverkets vägdatabas NVDB och kan vara fel eller inaktuella. Hinder högre än 4,5 m finns inte med. Tillfälliga hinder (vägarbeten), lokala viktbegränsningar på enskilda broar och tjällossningsrestriktioner finns inte heller med. Uppgifterna om farligt gods kommer från NVDB och omfattar inte alla lokala föreskrifter eller tidsstyrda förbud. Viktberäkningen följer trafikförordningens bruttoviktstabeller (bilaga 1–4) och 4 kap. 12 §, men tar inte hänsyn till särskilda regler för enskilda fordon, alternativa bränslen eller dispenser. Föraren ansvarar alltid för att ekipaget är lagligt.</p>
+
+  </form>
+</dialog>
+
+<!-- ===== Första start ===== -->
+<dialog id="dlgStart" class="ark" aria-labelledby="startRubrik">
+  <form method="dialog" id="formStart">
+    <label for="inStartSprak" class="liten-text">Språk / Language</label>
+    <select id="inStartSprak" data-ingen-oversattning></select>
+    <h2 id="startRubrik">Hur högt är ditt fordon?</h2>
+    <p class="muted">Ange höjden med last. Appen visar vilka broar och andra hinder du inte kommer under.</p>
+    <div class="stegare stor-stegare">
+      <button type="button" data-steg="-0.05" aria-label="Minska 5 cm">−</button>
+      <input id="inStartHojd" type="number" inputmode="decimal" step="0.01" min="1.5" max="5" value="4.00" aria-label="Fordonets höjd i meter">
+      <button type="button" data-steg="0.05" aria-label="Öka 5 cm">+</button>
+    </div>
+    <label for="inStartNamn">Namn på fordonet</label>
+    <input id="inStartNamn" type="text" maxlength="40" value="Mitt fordon">
+    <label for="inStartVikt">Bruttovikt (ton)</label>
+    <input id="inStartVikt" type="number" inputmode="decimal" step="0.1" min="1" max="100" value="40">
+    <label for="inStartAvst">Avstånd första–sista axeln (meter)</label>
+    <input id="inStartAvst" type="number" inputmode="decimal" step="0.01" min="0.5" max="40" value="12.5">
+    <p class="muted liten-text">Mått, axeltryck och fler fordon lägger du till under Inställningar.</p>
+    <p class="ansvar">Följ alltid skyltningen på plats. Datan kan vara fel eller inaktuell, och hinder över 4,5 m finns inte med. Föraren ansvarar alltid för höjd och vikt.</p>
+    <button value="ok" class="knapp-prim">Jag förstår – börja</button>
+  </form>
+</dialog>
+
+<script src="lib/leaflet/leaflet.js"></script>
+<script src="i18n.js?v=22"></script>
+<script src="vikt.js?v=22"></script>
+<script src="app.js?v=22"></script>
+</body>
+</html>
