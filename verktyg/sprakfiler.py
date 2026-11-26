@@ -237,7 +237,7 @@ TEXT = [
 ("– trafikförordningen 4 kap. 22–23 §§.", "– Swedish Traffic Ordinance chapter 4 sections 22–23.", "– szwedzkie rozporządzenie o ruchu drogowym, rozdz. 4 §§ 22–23.", "– Ordonanța suedeză privind traficul, cap. 4 §§ 22–23."),
 ("Karta och teknik", "Map and technology", "Mapa i technologia", "Hartă și tehnologie"),
 ("Bakgrundskarta", "Background map", "Mapa bazowa", "Hartă de fundal"),
-("– © OpenStreetMaps bidragsgivare (ODbL). Mörk karta och reservkarta: © CARTO.", "– © OpenStreetMap contributors (ODbL). Dark map and fallback map: © CARTO.", "– © współtwórcy OpenStreetMap (ODbL). Mapa ciemna i zapasowa: © CARTO.", "– © contribuitorii OpenStreetMap (ODbL). Harta întunecată și cea de rezervă: © CARTO."),
+("– © OpenStreetMaps bidragsgivare (ODbL). Reservkarta: OpenStreetMap France.", "– © OpenStreetMap contributors (ODbL). Fallback map: OpenStreetMap France.", "– © współtwórcy OpenStreetMap (ODbL). Mapa zapasowa: OpenStreetMap France.", "– © contribuitorii OpenStreetMap (ODbL). Hartă de rezervă: OpenStreetMap France."),
 ("Kartvisning", "Map display", "Wyświetlanie mapy", "Afișarea hărții"),
 ("– Leaflet 1.9.4 (öppen källkod, BSD-licens), inbyggd i appen.", "– Leaflet 1.9.4 (open source, BSD licence), built into the app.", "– Leaflet 1.9.4 (otwarte oprogramowanie, licencja BSD), wbudowany w aplikację.", "– Leaflet 1.9.4 (sursă deschisă, licență BSD), inclus în aplicație."),
 ("Typsnitt", "Fonts", "Czcionki", "Fonturi"),
@@ -246,10 +246,10 @@ TEXT = [
 ("Lokala trafikföreskrifter:", "Local traffic regulations:", "Lokalne przepisy ruchu:", "Reglementări locale de trafic:"),
 ("– www.stfs.se", "– www.stfs.se", "– www.stfs.se", "– www.stfs.se"),
 ("Vägdata på karta:", "Road data on a map:", "Dane drogowe na mapie:", "Date rutiere pe hartă:"),
-("Inga personuppgifter skickas till oss. Fordon och inställningar sparas bara i din telefon, och din position används bara i appen. Kartbilderna hämtas från OpenStreetMap och CARTO.",
- "No personal data is sent to us. Vehicles and settings are stored only on your phone, and your location is used only in the app. Map images are loaded from OpenStreetMap and CARTO.",
- "Żadne dane osobowe nie są do nas wysyłane. Pojazdy i ustawienia są zapisywane tylko w telefonie, a twoja lokalizacja jest używana tylko w aplikacji. Obrazy mapy pobierane są z OpenStreetMap i CARTO.",
- "Nu ne sunt trimise date personale. Vehiculele și setările sunt salvate doar în telefon, iar poziția ta este folosită doar în aplicație. Imaginile hărții sunt încărcate de la OpenStreetMap și CARTO."),
+("Inga personuppgifter skickas till oss. Fordon och inställningar sparas bara i din telefon, och din position används bara i appen. Kartbilderna hämtas från OpenStreetMap.",
+ "No personal data is sent to us. Vehicles and settings are stored only on your phone, and your location is used only in the app. Map images are loaded from OpenStreetMap.",
+ "Żadne dane osobowe nie są do nas wysyłane. Pojazdy i ustawienia są zapisywane tylko w telefonie, a twoja lokalizacja jest używana tylko w aplikacji. Obrazy mapy pobierane są z OpenStreetMap.",
+ "Nu ne sunt trimise date personale. Vehiculele și setările sunt salvate doar în telefon, iar poziția ta este folosită doar în aplicație. Imaginile hărții sunt încărcate de la OpenStreetMap."),
 ("Integritetspolicy / Privacy policy", "Privacy policy", "Polityka prywatności / Privacy policy", "Politica de confidențialitate / Privacy policy"),
 
 # Exempeldata

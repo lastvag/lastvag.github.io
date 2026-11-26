@@ -74,6 +74,7 @@ html[data-tema=morkt] .chip.aktiv{background:var(--gul);color:var(--svart);borde
 .leaflet-popup-content{font:15px/1.4 var(--text);margin:12px 14px}
 .leaflet-popup-content b{font:700 20px/1.1 var(--rubrik)}
 .leaflet-container{font-family:var(--text)}
+#karta.mork-karta .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.9) saturate(.6)}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--yta);color:var(--ink)}
 html[data-tema=morkt] .leaflet-bar a{background:var(--yta);color:var(--ink);border-color:var(--linje)}
 html[data-tema=morkt] .leaflet-control-attribution{background:rgba(15,19,24,.8);color:var(--muted)}

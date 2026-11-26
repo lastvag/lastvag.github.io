@@ -333,23 +333,19 @@ const renderer = window.L ? L.canvas({ padding: 0.3 }) : null;
 const FARG = { rod: '#D0021B', gul: '#F2B705', gron: '#1E9E5A' };
 
 /* Bakgrundskartor. Vägkartan (OpenStreetMap) visar alla vägar, vägnummer och gatunamn.
-   Om en kartkälla inte svarar byter appen automatiskt till nästa. */
+   Mörkt läge använder samma karta, mörklagd med ett filter (se .mork-karta i style.css).
+   Om huvudkällan inte svarar byter appen automatiskt till reservkällan. */
 const KARTKALLOR = {
   vag: { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', opt: { maxZoom: 19 },
     attr: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' },
-  vagMork: { url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', opt: { maxZoom: 19, subdomains: 'abcd' },
-    attr: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>' },
-  reserv: { url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', opt: { maxZoom: 19, subdomains: 'abcd' },
-    attr: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>' }
+  reserv: { url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', opt: { maxZoom: 19, subdomains: 'abc' },
+    attr: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, OpenStreetMap France' }
 };
 let kartkallaFel = new Set();
-function valjKartkalla() {
-  const onskad = morkt ? 'vagMork' : 'vag';
-  if (!kartkallaFel.has(onskad)) return onskad;
-  return !kartkallaFel.has('reserv') ? 'reserv' : onskad;
-}
+function valjKartkalla() { return kartkallaFel.has('vag') && !kartkallaFel.has('reserv') ? 'reserv' : 'vag'; }
 function bytKartlager() {
   if (kartlager) karta.removeLayer(kartlager);
+  document.getElementById('karta').classList.toggle('mork-karta', morkt);
   const namn = valjKartkalla(), k = KARTKALLOR[namn];
   let fel = 0, ok = 0;
   kartlager = L.tileLayer(k.url, { ...k.opt, attribution: k.attr + ' · Vägdata © Trafikverket' });
